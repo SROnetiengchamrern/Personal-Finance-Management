@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --fh-bg: #f4f7f6;
+    --fh-surface: #ffffff;
+    --fh-ink: #0f1f1c;
+    --fh-muted: #5b6b67;
+    --fh-accent: #0f766e;
+    --fh-accent-soft: #ccfbf1;
+    --fh-income: #15803d;
+    --fh-expense: #b91c1c;
+    --fh-border: #d7e2df;
+    --fh-sidebar: #0b1f1c;
+}
+
+@layer base {
+    body {
+        @apply antialiased;
+        background: var(--fh-bg);
+        color: var(--fh-ink);
+    }
+}
+
+@layer components {
+    .fh-card {
+        @apply rounded-2xl border bg-white;
+        border-color: var(--fh-border);
+    }
+
+    .fh-input {
+        @apply w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-700 focus:ring-teal-700;
+    }
+
+    .fh-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition;
+    }
+
+    .fh-btn-primary {
+        @apply fh-btn text-white;
+        background: var(--fh-accent);
+    }
+
+    .fh-btn-primary:hover {
+        @apply bg-teal-800;
+    }
+
+    .fh-btn-ghost {
+        @apply fh-btn border bg-white text-teal-900;
+        border-color: var(--fh-border);
+    }
+
+    .fh-btn-danger {
+        @apply fh-btn border border-red-200 bg-red-50 text-red-700 hover:bg-red-100;
+    }
+}

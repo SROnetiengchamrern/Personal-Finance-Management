@@ -1,0 +1,37 @@
+git clone <your-repo-url> PersonalFinanceManagement
+cd PersonalFinanceManagement
+composer install
+copy .env.example .env
+php artisan key:generate
+
+Configure database in .env
+CREATE DATABASE db_personal_finance CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+php artisan migrate
+php artisan db:seed
+php artisan migrate --seed
+
+npm install
+npm run build
+
+php artisan serve
+npm run dev
+
+Google login (optional)
+php artisan config:clear
+
+php artisan migrate
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+npm run build
+composer install
+npm install
+
+One-shot setup (after .env is ready)
+composer install
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run build
+php artisan serve

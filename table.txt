@@ -1,0 +1,208 @@
+Database Schema
+
+1. users
+id
+name
+email
+phone
+password
+avatar
+currency
+timezone
+language
+email_verified_at
+remember_token
+created_at
+updated_at
+
+
+2. wallets
+id
+user_id
+name
+type            -- Cash, Bank, Credit Card, E-Wallet
+balance
+currency
+color
+icon
+status
+created_at
+updated_at
+
+3. income_categories
+id
+user_id
+name
+icon
+color
+created_at
+updated_at
+
+Example
+
+Salary
+Bonus
+Freelance
+Investment
+Gift
+
+4. expense_categories
+id
+user_id
+name
+icon
+color
+created_at
+updated_at
+
+Example
+
+Food
+Transport
+Shopping
+Entertainment
+Health
+Bills
+Education
+
+5. transactions
+id
+user_id
+wallet_id
+category_id
+type            -- income, expense, transfer
+amount
+note
+transaction_date
+attachment
+created_at
+updated_at
+
+6. transfers
+id
+user_id
+from_wallet_id
+to_wallet_id
+amount
+note
+transfer_date
+created_at
+updated_at
+
+7. budgets
+id
+user_id
+category_id
+amount
+month
+year
+created_at
+updated_at
+
+8. savings_goals
+id
+user_id
+name
+target_amount
+current_amount
+deadline
+icon
+created_at
+updated_at
+
+
+9. saving_transactions
+id
+goal_id
+wallet_id
+amount
+type            -- deposit, withdraw
+created_at
+updated_at
+
+10. recurring_transactions
+id
+user_id
+wallet_id
+category_id
+type
+amount
+title
+frequency        -- daily, weekly, monthly, yearly
+next_run
+status
+created_at
+updated_at
+
+11. notifications
+id
+user_id
+title
+message
+is_read
+created_at
+updated_at
+
+12. currencies
+id
+code
+symbol
+name
+exchange_rate
+created_at
+updated_at
+
+Example
+
+USD
+EUR
+KHR
+THB
+
+13. attachments
+id
+transaction_id
+file_name
+file_path
+created_at
+updated_at
+
+14. tags
+id
+user_id
+name
+color
+created_at
+updated_at
+15. transaction_tags
+
+transaction_id
+tag_id
+
+16. settings
+id
+user_id
+theme
+currency
+language
+date_format
+notification
+created_at
+updated_at
+
+
+
+
+Optional Admin Tables
+
+roles
+id
+name
+
+permissions
+id
+name
+
+role_user
+user_id
+role_id
