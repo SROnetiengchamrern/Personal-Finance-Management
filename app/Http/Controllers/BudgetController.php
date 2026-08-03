@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Budget;
 use App\Models\ExpenseCategory;
 use App\Models\Transaction;
+use App\Services\CurrencyConverter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,36 +15,51 @@ class BudgetController extends Controller
 {
     public function index(Request $request): Response
     {
+        $user = $request->user();
         $month = (int) $request->input('month', now()->month);
         $year = (int) $request->input('year', now()->year);
+        $displayCurrency = strtoupper($user->currency ?? 'USD');
+        $converter = app(CurrencyConverter::class);
 
         $budgets = Budget::with('category:id,name,color,icon')
-            ->where('user_id', $request->user()->id)
+            ->where('user_id', $user->id)
             ->where('month', $month)
             ->where('year', $year)
             ->get()
-            ->map(function (Budget $budget) use ($request, $month, $year) {
-                $spent = (float) Transaction::where('user_id', $request->user()->id)
+            ->map(function (Budget $budget) use ($user, $month, $year, $converter, $displayCurrency) {
+                $spent = Transaction::with('wallet:id,currency')
+                    ->where('user_id', $user->id)
                     ->where('type', 'expense')
                     ->where('category_id', $budget->category_id)
                     ->whereMonth('transaction_date', $month)
                     ->whereYear('transaction_date', $year)
-                    ->sum('amount');
+                    ->get(['id', 'wallet_id', 'amount'])
+                    ->sum(function (Transaction $tx) use ($converter, $displayCurrency) {
+                        return $converter->convert(
+                            (float) $tx->amount,
+                            $tx->wallet?->currency ?: 'USD',
+                            $displayCurrency
+                        );
+                    });
+
+                $spent = round((float) $spent, 2);
 
                 return [
                     ...$budget->toArray(),
                     'spent' => $spent,
-                    'remaining' => (float) $budget->amount - $spent,
+                    'remaining' => round((float) $budget->amount - $spent, 2),
                     'percent' => $budget->amount > 0
                         ? min(100, round(($spent / (float) $budget->amount) * 100, 1))
                         : 0,
+                    'currency' => $displayCurrency,
                 ];
             });
 
         return Inertia::render('Budgets/Index', [
             'budgets' => $budgets,
             'filters' => compact('month', 'year'),
-            'categories' => ExpenseCategory::where('user_id', $request->user()->id)->orderBy('name')->get(['id', 'name', 'color']),
+            'currency' => $displayCurrency,
+            'categories' => ExpenseCategory::where('user_id', $user->id)->orderBy('name')->get(['id', 'name', 'color']),
         ]);
     }
 

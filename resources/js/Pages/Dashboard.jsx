@@ -61,7 +61,7 @@ export default function Dashboard({ stats, wallets, recentTransactions, budgets,
                                     </div>
                                     <p className={`shrink-0 font-bold ${tx.type === 'income' ? 'text-emerald-700' : 'text-rose-700'}`}>
                                         {tx.type === 'income' ? '+' : '-'}
-                                        {formatMoney(tx.amount, stats.currency)}
+                                        {formatMoney(tx.display_amount ?? tx.amount, stats.currency)}
                                     </p>
                                 </div>
                             ))}

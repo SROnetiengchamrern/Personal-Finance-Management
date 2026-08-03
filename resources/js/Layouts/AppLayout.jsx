@@ -10,6 +10,7 @@ import { useState } from 'react';
 
 const nav = [
     { labelKey: 'nav.dashboard', href: 'dashboard', icon: 'dashboard', match: 'dashboard' },
+    { labelKey: 'nav.reports', href: 'reports.index', icon: 'reports', match: 'reports.*' },
     { labelKey: 'nav.wallets', href: 'wallets.index', icon: 'wallets', match: 'wallets.*' },
     { labelKey: 'nav.transactions', href: 'transactions.index', icon: 'transactions', match: 'transactions.*' },
     { labelKey: 'nav.salary', href: 'salaries.index', icon: 'salary', match: 'salaries.*' },

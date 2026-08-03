@@ -11,7 +11,7 @@ use Inertia\Response;
 
 class CurrencyController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $currencies = Currency::query()
             ->orderBy('code')
@@ -21,20 +21,21 @@ class CurrencyController extends Controller
 
                 return [
                     ...$currency->toArray(),
-                    // Helpful preview: how much 1 USD is worth in this currency
                     'usd_example' => $rate > 0 ? round(1 * $rate, 4) : null,
-                    // And how much of this currency equals 1 USD displayed as convert hint
                     'to_usd_example' => $rate > 0 ? round(1 / $rate, 6) : null,
                 ];
             });
 
         return Inertia::render('Currencies/Index', [
             'currencies' => $currencies,
+            'canManage' => $request->user()?->isAdmin() ?? false,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->ensureAdmin($request);
+
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:10', 'alpha', 'unique:currencies,code'],
             'symbol' => ['required', 'string', 'max:10'],
@@ -52,6 +53,8 @@ class CurrencyController extends Controller
 
     public function update(Request $request, Currency $currency): RedirectResponse
     {
+        $this->ensureAdmin($request);
+
         $validated = $request->validate([
             'code' => [
                 'required',
@@ -65,7 +68,6 @@ class CurrencyController extends Controller
             'exchange_rate' => ['required', 'numeric', 'min:0.000001'],
         ]);
 
-        // Keep USD base rate locked to 1
         if (strtoupper($currency->code) === 'USD') {
             $validated['code'] = 'USD';
             $validated['exchange_rate'] = 1;
@@ -78,8 +80,10 @@ class CurrencyController extends Controller
         return back()->with('success', 'Currency updated.');
     }
 
-    public function destroy(Currency $currency): RedirectResponse
+    public function destroy(Request $request, Currency $currency): RedirectResponse
     {
+        $this->ensureAdmin($request);
+
         if (strtoupper($currency->code) === 'USD') {
             return back()->with('error', 'USD is the base currency and cannot be deleted.');
         }
@@ -87,5 +91,10 @@ class CurrencyController extends Controller
         $currency->delete();
 
         return back()->with('success', 'Currency deleted.');
+    }
+
+    private function ensureAdmin(Request $request): void
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
     }
 }

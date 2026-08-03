@@ -93,7 +93,7 @@ function AddCurrencyForm() {
     );
 }
 
-function CurrencyRow({ currency }) {
+function CurrencyRow({ currency, canManage }) {
     const { t } = useTranslation();
     const isUsd = currency.code === 'USD';
     const [editing, setEditing] = useState(false);
@@ -198,28 +198,32 @@ function CurrencyRow({ currency }) {
                     : `1 ${currency.code} ≈ $${Number(currency.to_usd_example).toFixed(6)}`}
             </td>
             <td className="px-4 py-3 text-right whitespace-nowrap">
-                <button type="button" className="mr-2 text-brand-700 hover:underline" onClick={() => setEditing(true)}>
-                    {t('common.edit')}
-                </button>
-                {!isUsd && (
-                    <button
-                        type="button"
-                        className="text-rose-700 hover:underline"
-                        onClick={() => {
-                            if (confirm(t('currencies.delete_confirm', { code: currency.code }))) {
-                                router.delete(route('currencies.destroy', currency.id));
-                            }
-                        }}
-                    >
-                        {t('common.delete')}
-                    </button>
+                {canManage && (
+                    <>
+                        <button type="button" className="mr-2 text-brand-700 hover:underline" onClick={() => setEditing(true)}>
+                            {t('common.edit')}
+                        </button>
+                        {!isUsd && (
+                            <button
+                                type="button"
+                                className="text-rose-700 hover:underline"
+                                onClick={() => {
+                                    if (confirm(t('currencies.delete_confirm', { code: currency.code }))) {
+                                        router.delete(route('currencies.destroy', currency.id));
+                                    }
+                                }}
+                            >
+                                {t('common.delete')}
+                            </button>
+                        )}
+                    </>
                 )}
             </td>
         </tr>
     );
 }
 
-export default function Index({ currencies }) {
+export default function Index({ currencies, canManage = false }) {
     const { t } = useTranslation();
 
     return (
@@ -230,14 +234,14 @@ export default function Index({ currencies }) {
                 subtitle={t('currencies.subtitle')}
             />
 
-            <div className="grid gap-6 lg:grid-cols-3">
-                <AddCurrencyForm />
+            <div className={`grid gap-6 ${canManage ? 'lg:grid-cols-3' : ''}`}>
+                {canManage && <AddCurrencyForm />}
 
-                <div className="fh-card overflow-hidden lg:col-span-2">
+                <div className={`fh-card overflow-hidden ${canManage ? 'lg:col-span-2' : ''}`}>
                     <div className="border-b border-[var(--fh-border)] px-4 py-3">
                         <h2 className="font-bold text-brand-950">{t('currencies.rates_title')}</h2>
                         <p className="text-xs text-[var(--fh-muted)]">
-                            {t('currencies.rates_desc')}
+                            {canManage ? t('currencies.rates_desc') : t('currencies.view_only')}
                         </p>
                     </div>
                     <div className="overflow-x-auto">
@@ -249,16 +253,16 @@ export default function Index({ currencies }) {
                                     <th className="px-4 py-3">{t('currencies.rate_per_usd')}</th>
                                     <th className="px-4 py-3">{t('currencies.one_usd_equals')}</th>
                                     <th className="px-4 py-3">{t('currencies.to_usd')}</th>
-                                    <th className="px-4 py-3" />
+                                    {canManage && <th className="px-4 py-3" />}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--fh-border)]">
                                 {currencies.map((currency) => (
-                                    <CurrencyRow key={currency.id} currency={currency} />
+                                    <CurrencyRow key={currency.id} currency={currency} canManage={canManage} />
                                 ))}
                                 {currencies.length === 0 && (
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-10 text-center text-[var(--fh-muted)]">
+                                        <td colSpan={canManage ? 6 : 5} className="px-4 py-10 text-center text-[var(--fh-muted)]">
                                             {t('currencies.empty')}
                                         </td>
                                     </tr>

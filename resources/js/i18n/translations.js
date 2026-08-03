@@ -10,6 +10,7 @@ const en = {
     'footer.rights': 'All rights reserved.',
     'footer.made_for': 'Built for personal money tracking.',
     'nav.dashboard': 'Dashboard',
+    'nav.reports': 'Reports',
     'nav.wallets': 'Wallets',
     'nav.transactions': 'Transactions',
     'nav.salary': 'My salary',
@@ -120,6 +121,8 @@ const en = {
     'transactions.income': 'Income',
     'transactions.expense': 'Expense',
     'transactions.all_wallets': 'All wallets',
+    'transactions.all_categories': 'All categories',
+    'transactions.search_placeholder': 'Search notes…',
     'transactions.empty_title': 'No transactions',
     'transactions.empty_desc': 'Record your first income or expense.',
     'transactions.create_title': 'Add transaction',
@@ -207,6 +210,7 @@ const en = {
     'currencies.rate': 'Exchange rate (per 1 USD)',
     'currencies.rates_title': 'Exchange rates',
     'currencies.rates_desc': 'Dashboard converts KHR, THB, and others into your display currency using these rates.',
+    'currencies.view_only': 'Only admins can add or edit exchange rates.',
     'currencies.rate_per_usd': 'Rate / 1 USD',
     'currencies.one_usd_equals': '1 USD equals',
     'currencies.to_usd': 'To USD',
@@ -326,6 +330,11 @@ const en = {
     'guest.stat_wallets_value': 'USD + KHR',
     'guest.stat_salary_value': 'Monthly',
     'guest.stat_live_value': 'Convert',
+    'reports.title': 'Reports',
+    'reports.subtitle': 'Monthly cashflow and spending by category in your display currency.',
+    'reports.by_category': 'Spending by category',
+    'reports.daily_cashflow': 'Daily cashflow',
+    'reports.no_data': 'No expense data for this month.',
 };
 
 const km = {
@@ -335,6 +344,7 @@ const km = {
     'footer.rights': 'រក្សាសិទ្ធិគ្រប់យ៉ាង។',
     'footer.made_for': 'បង្កើតសម្រាប់តាមដានលុយផ្ទាល់ខ្លួន។',
     'nav.dashboard': 'ផ្ទាំងគ្រប់គ្រង',
+    'nav.reports': 'របាយការណ៍',
     'nav.wallets': 'កាបូបលុយ',
     'nav.transactions': 'ប្រតិបត្តិការ',
     'nav.salary': 'ប្រាក់ខែរបស់ខ្ញុំ',
@@ -445,6 +455,8 @@ const km = {
     'transactions.income': 'ចំណូល',
     'transactions.expense': 'ចំណាយ',
     'transactions.all_wallets': 'គ្រប់កាបូប',
+    'transactions.all_categories': 'គ្រប់ប្រភេទ',
+    'transactions.search_placeholder': 'ស្វែងរកចំណាំ…',
     'transactions.empty_title': 'មិនមានប្រតិបត្តិការ',
     'transactions.empty_desc': 'កត់ត្រាចំណូល ឬចំណាយដំបូងរបស់អ្នក។',
     'transactions.create_title': 'បន្ថែមប្រតិបត្តិការ',
@@ -532,6 +544,7 @@ const km = {
     'currencies.rate': 'អត្រាប្តូរប្រាក់ (ក្នុង 1 USD)',
     'currencies.rates_title': 'អត្រាប្តូរប្រាក់',
     'currencies.rates_desc': 'ផ្ទាំងគ្រប់គ្រងបម្លែង KHR, THB និងផ្សេងទៀតទៅរូបិយប័ណ្ណបង្ហាញតាមអត្រាទាំងនេះ។',
+    'currencies.view_only': 'មានតែអ្នកគ្រប់គ្រងទេដែលអាចបន្ថែម ឬកែអត្រាប្តូរប្រាក់។',
     'currencies.rate_per_usd': 'អត្រា / 1 USD',
     'currencies.one_usd_equals': '1 USD ស្មើ',
     'currencies.to_usd': 'ទៅ USD',
@@ -651,6 +664,11 @@ const km = {
     'guest.stat_wallets_value': 'USD + KHR',
     'guest.stat_salary_value': 'ប្រចាំខែ',
     'guest.stat_live_value': 'បម្លែង',
+    'reports.title': 'របាយការណ៍',
+    'reports.subtitle': 'លំហូរសាច់ប្រាក់ប្រចាំខែ និងចំណាយតាមប្រភេទជារូបិយប័ណ្ណបង្ហាញរបស់អ្នក។',
+    'reports.by_category': 'ចំណាយតាមប្រភេទ',
+    'reports.daily_cashflow': 'លំហូរប្រចាំថ្ងៃ',
+    'reports.no_data': 'មិនមានទិន្នន័យចំណាយសម្រាប់ខែនេះ។',
 };
 
 export const dictionaries = { en, km };

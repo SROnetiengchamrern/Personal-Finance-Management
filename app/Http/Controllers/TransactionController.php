@@ -19,7 +19,7 @@ class TransactionController extends Controller
     {
         $query = $request->user()
             ->transactions()
-            ->with(['wallet:id,name,color'])
+            ->with(['wallet:id,name,color,currency'])
             ->latest('transaction_date')
             ->latest('id');
 
@@ -31,10 +31,29 @@ class TransactionController extends Controller
             $query->where('wallet_id', $request->integer('wallet_id'));
         }
 
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->integer('category_id'));
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('transaction_date', '>=', $request->string('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('transaction_date', '<=', $request->string('date_to'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->string('search');
+            $query->where('note', 'like', "%{$search}%");
+        }
+
         return Inertia::render('Transactions/Index', [
             'transactions' => $query->paginate(15)->withQueryString(),
-            'filters' => $request->only(['type', 'wallet_id']),
+            'filters' => $request->only(['type', 'wallet_id', 'category_id', 'date_from', 'date_to', 'search']),
             'wallets' => $request->user()->wallets()->orderBy('name')->get(['id', 'name']),
+            'incomeCategories' => IncomeCategory::where('user_id', $request->user()->id)->orderBy('name')->get(['id', 'name']),
+            'expenseCategories' => ExpenseCategory::where('user_id', $request->user()->id)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

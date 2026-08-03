@@ -8,7 +8,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { formatMoney } from '@/lib/format';
 import { Head, router, useForm } from '@inertiajs/react';
 
-export default function Index({ budgets, filters, categories }) {
+export default function Index({ budgets, filters, categories, currency = 'USD' }) {
     const { t } = useTranslation();
     const form = useForm({
         category_id: categories[0]?.id || '',
@@ -77,8 +77,8 @@ export default function Index({ budgets, filters, categories }) {
                                         <h3 className="font-bold text-brand-950">{budget.category?.name}</h3>
                                         <p className="text-xs text-[var(--fh-muted)]">
                                             {t('budgets.spent_of', {
-                                                spent: formatMoney(budget.spent),
-                                                amount: formatMoney(budget.amount),
+                                                spent: formatMoney(budget.spent, budget.currency || currency),
+                                                amount: formatMoney(budget.amount, budget.currency || currency),
                                             })}
                                         </p>
                                     </div>

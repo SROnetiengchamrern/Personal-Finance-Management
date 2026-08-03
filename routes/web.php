@@ -10,6 +10,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecurringTransactionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SavingsGoalController;
 use App\Http\Controllers\SettingController;
@@ -29,6 +30,8 @@ Route::put('/language', [LanguageController::class, 'update'])->name('language.u
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     Route::resource('wallets', WalletController::class)->except(['show']);
 

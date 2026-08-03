@@ -4,10 +4,33 @@ import { useTranslation } from '@/i18n/useTranslation';
 import AppLayout from '@/Layouts/AppLayout';
 import { formatDate, formatMoney } from '@/lib/format';
 import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function Index({ transactions, filters, wallets }) {
+export default function Index({ transactions, filters, wallets, incomeCategories = [], expenseCategories = [] }) {
     const { t } = useTranslation();
     const rows = transactions.data || [];
+    const [local, setLocal] = useState({
+        type: filters.type || '',
+        wallet_id: filters.wallet_id || '',
+        category_id: filters.category_id || '',
+        date_from: filters.date_from || '',
+        date_to: filters.date_to || '',
+        search: filters.search || '',
+    });
+
+    const applyFilters = (next = local) => {
+        const payload = Object.fromEntries(
+            Object.entries(next).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+        );
+        router.get(route('transactions.index'), payload, { preserveState: true });
+    };
+
+    const categoryOptions =
+        local.type === 'income'
+            ? incomeCategories
+            : local.type === 'expense'
+                ? expenseCategories
+                : [...incomeCategories, ...expenseCategories];
 
     return (
         <AppLayout title={t('transactions.title')}>
@@ -19,26 +42,81 @@ export default function Index({ transactions, filters, wallets }) {
                 actionHref={route('transactions.create')}
             />
 
-            <div className="fh-card mb-4 flex flex-wrap gap-3 p-4">
-                <select
-                    className="fh-input max-w-xs"
-                    value={filters.type || ''}
-                    onChange={(e) => router.get(route('transactions.index'), { ...filters, type: e.target.value || undefined }, { preserveState: true })}
-                >
-                    <option value="">{t('transactions.all_types')}</option>
-                    <option value="income">{t('transactions.income')}</option>
-                    <option value="expense">{t('transactions.expense')}</option>
-                </select>
-                <select
-                    className="fh-input max-w-xs"
-                    value={filters.wallet_id || ''}
-                    onChange={(e) => router.get(route('transactions.index'), { ...filters, wallet_id: e.target.value || undefined }, { preserveState: true })}
-                >
-                    <option value="">{t('transactions.all_wallets')}</option>
-                    {wallets.map((w) => (
-                        <option key={w.id} value={w.id}>{w.name}</option>
-                    ))}
-                </select>
+            <div className="fh-card mb-4 space-y-3 p-4">
+                <div className="flex flex-wrap gap-3">
+                    <select
+                        className="fh-input max-w-xs"
+                        value={local.type}
+                        onChange={(e) => {
+                            const next = { ...local, type: e.target.value, category_id: '' };
+                            setLocal(next);
+                            applyFilters(next);
+                        }}
+                    >
+                        <option value="">{t('transactions.all_types')}</option>
+                        <option value="income">{t('transactions.income')}</option>
+                        <option value="expense">{t('transactions.expense')}</option>
+                    </select>
+                    <select
+                        className="fh-input max-w-xs"
+                        value={local.wallet_id}
+                        onChange={(e) => {
+                            const next = { ...local, wallet_id: e.target.value };
+                            setLocal(next);
+                            applyFilters(next);
+                        }}
+                    >
+                        <option value="">{t('transactions.all_wallets')}</option>
+                        {wallets.map((w) => (
+                            <option key={w.id} value={w.id}>{w.name}</option>
+                        ))}
+                    </select>
+                    <select
+                        className="fh-input max-w-xs"
+                        value={local.category_id}
+                        onChange={(e) => {
+                            const next = { ...local, category_id: e.target.value };
+                            setLocal(next);
+                            applyFilters(next);
+                        }}
+                    >
+                        <option value="">{t('transactions.all_categories')}</option>
+                        {categoryOptions.map((c) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                    <input
+                        type="date"
+                        className="fh-input max-w-xs"
+                        value={local.date_from}
+                        onChange={(e) => setLocal({ ...local, date_from: e.target.value })}
+                        onBlur={() => applyFilters()}
+                    />
+                    <input
+                        type="date"
+                        className="fh-input max-w-xs"
+                        value={local.date_to}
+                        onChange={(e) => setLocal({ ...local, date_to: e.target.value })}
+                        onBlur={() => applyFilters()}
+                    />
+                    <input
+                        type="search"
+                        className="fh-input min-w-[200px] flex-1"
+                        placeholder={t('transactions.search_placeholder')}
+                        value={local.search}
+                        onChange={(e) => setLocal({ ...local, search: e.target.value })}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                applyFilters();
+                            }
+                        }}
+                    />
+                    <button type="button" className="fh-btn-primary" onClick={() => applyFilters()}>
+                        {t('common.search')}
+                    </button>
+                </div>
             </div>
 
             {rows.length === 0 ? (
@@ -74,7 +152,7 @@ export default function Index({ transactions, filters, wallets }) {
                                         <td className="px-4 py-3">{tx.wallet?.name}</td>
                                         <td className="px-4 py-3 max-w-xs truncate">{tx.note || '—'}</td>
                                         <td className={`px-4 py-3 text-right font-bold ${tx.type === 'income' ? 'text-emerald-700' : 'text-rose-700'}`}>
-                                            {formatMoney(tx.amount)}
+                                            {formatMoney(tx.amount, tx.wallet?.currency)}
                                         </td>
                                         <td className="px-4 py-3 text-right whitespace-nowrap">
                                             <Link href={route('transactions.edit', tx.id)} className="mr-2 text-brand-700 hover:underline">{t('common.edit')}</Link>

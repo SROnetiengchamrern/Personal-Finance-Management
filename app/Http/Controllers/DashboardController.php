@@ -60,33 +60,56 @@ class DashboardController extends Controller
                 );
             });
 
-        $recentTransactions = $user->transactions()
-            ->with('wallet:id,name,color,currency')
-            ->latest('transaction_date')
-            ->latest('id')
-            ->limit(8)
-            ->get();
-
         $budgets = Budget::with('category:id,name,color,icon')
             ->where('user_id', $user->id)
             ->where('month', $now->month)
             ->where('year', $now->year)
             ->get()
-            ->map(function (Budget $budget) use ($user, $now) {
-                $spent = (float) Transaction::where('user_id', $user->id)
+            ->map(function (Budget $budget) use ($user, $now, $converter, $displayCurrency) {
+                $spent = Transaction::with('wallet:id,currency')
+                    ->where('user_id', $user->id)
                     ->where('type', 'expense')
                     ->where('category_id', $budget->category_id)
                     ->whereMonth('transaction_date', $now->month)
                     ->whereYear('transaction_date', $now->year)
-                    ->sum('amount');
+                    ->get(['id', 'wallet_id', 'amount'])
+                    ->sum(function (Transaction $tx) use ($converter, $displayCurrency) {
+                        return $converter->convert(
+                            (float) $tx->amount,
+                            $tx->wallet?->currency ?: 'USD',
+                            $displayCurrency
+                        );
+                    });
+
+                $spent = round((float) $spent, 2);
 
                 return [
                     ...$budget->toArray(),
                     'spent' => $spent,
-                    'remaining' => (float) $budget->amount - $spent,
+                    'remaining' => round((float) $budget->amount - $spent, 2),
                     'percent' => $budget->amount > 0
                         ? min(100, round(($spent / (float) $budget->amount) * 100, 1))
                         : 0,
+                ];
+            });
+
+        $recentTransactions = $user->transactions()
+            ->with('wallet:id,name,color,currency')
+            ->latest('transaction_date')
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->map(function (Transaction $tx) use ($converter, $displayCurrency) {
+                $walletCurrency = $tx->wallet?->currency ?: 'USD';
+
+                return [
+                    ...$tx->toArray(),
+                    'display_amount' => round($converter->convert(
+                        (float) $tx->amount,
+                        $walletCurrency,
+                        $displayCurrency
+                    ), 2),
+                    'wallet_currency' => $walletCurrency,
                 ];
             });
 
