@@ -1,0 +1,45 @@
+git clone <your-repo-url> PersonalFinanceManagement
+cd PersonalFinanceManagement
+composer install
+copy .env.example .env
+php artisan key:generate
+
+APP_NAME=FinanceHub
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_personal_finance
+DB_USERNAME=root
+DB_PASSWORD=
+
+
+CREATE DATABASE db_personal_finance CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+php artisan migrate --seed
+
+npm install
+npm run build
+
+php artisan serve
+
+
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_REDIRECT_URI="${APP_URL}/auth/google/callback"
+
+php artisan config:clear
+
+php artisan recurring:run
+
+php artisan schedule:work
+
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run build
+php artisan serve
